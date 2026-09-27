@@ -1,0 +1,15 @@
+node_modules/
+ai-env/
+.env
+.vite/
+dist/
+__pycache__/
+*.pyc
+
+Backend/uploads/
+ai-service/uploads/
+
+*.backup
+*.backup2
+*.txt
+*.json
