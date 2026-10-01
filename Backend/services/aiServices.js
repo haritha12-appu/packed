@@ -6,10 +6,9 @@ const path = require("path");
 
 // ============================================================
 // FASTAPI AI SERVICE
-// ============================================================
+// ===========================================================
 
-const AI_SERVICE_URL = "http://127.0.0.1:8000/analyze";
-
+const AI_SERVICE_URL = "https://packed-ai-service.onrender.com/analyze";
 
 // ============================================================
 // PROCESS PACKAGE IMAGES
