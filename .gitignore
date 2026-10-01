@@ -12,3 +12,4 @@ ai-service/uploads/
 *.backup
 *.backup2
 *.txt
+ai-service/pipeline_result.json
