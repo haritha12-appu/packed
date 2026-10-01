@@ -111,8 +111,22 @@ const processPackageImages = async (imagePaths) => {
         // Read response
         // ----------------------------------------------------
 
-        const result =
-            await response.json();
+        const responseText = await response.text();
+
+console.log("AI service HTTP status:", response.status);
+console.log("AI service raw response:", responseText);
+
+let result;
+
+try {
+    result = responseText
+        ? JSON.parse(responseText)
+        : {};
+} catch (parseError) {
+    throw new Error(
+        `AI service returned invalid JSON: ${responseText}`
+    );
+}
 
 
         // ----------------------------------------------------
