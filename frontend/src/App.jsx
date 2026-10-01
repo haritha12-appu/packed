@@ -146,7 +146,7 @@ function App() {
       });
 
       const uploadResponse = await fetch(
-        "/api/scan/upload",
+        "https://packed-backend.onrender.com/api/scan/upload",
         {
           method: "POST",
           body: formData
@@ -181,7 +181,7 @@ function App() {
         );
 
       const scanResponse = await fetch(
-        "/api/scan/scan",
+        "https://packed-backend.onrender.com/api/scan/scan",
         {
           method: "POST",
           headers: {
