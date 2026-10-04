@@ -1,27 +1,11 @@
-// services/aiServices.js
-
 const fs = require("fs");
 const path = require("path");
 
-
-// ============================================================
-// FASTAPI AI SERVICE
-// ===========================================================
-
-const AI_SERVICE_URL = "https://packed-ai-service.onrender.com/analyze";
-
-// ============================================================
-// PROCESS PACKAGE IMAGES
-// Accepts one image or multiple images of the SAME product
-// ============================================================
+const AI_SERVICE_URL =
+    "https://packed-ai-service.onrender.com/analyze";
 
 const processPackageImages = async (imagePaths) => {
-
     try {
-
-        // ----------------------------------------------------
-        // Normalize input
-        // ----------------------------------------------------
 
         if (!Array.isArray(imagePaths)) {
             imagePaths = [imagePaths];
@@ -32,53 +16,26 @@ const processPackageImages = async (imagePaths) => {
         }
 
         if (imagePaths.length > 6) {
-            throw new Error(
-                "Maximum 6 images are allowed."
-            );
+            throw new Error("Maximum 6 images are allowed.");
         }
-
 
         console.log(
             `Sending ${imagePaths.length} image(s) to AI service...`
         );
 
-
-        // ----------------------------------------------------
-        // Check all images
-        // ----------------------------------------------------
+        const formData = new FormData();
 
         for (const imagePath of imagePaths) {
 
             if (!fs.existsSync(imagePath)) {
-
                 throw new Error(
                     `Image file not found: ${imagePath}`
                 );
             }
-        }
 
+            const imageBuffer = fs.readFileSync(imagePath);
 
-        // ----------------------------------------------------
-        // Create multipart form
-        // ----------------------------------------------------
-
-        const formData = new FormData();
-
-
-        // ----------------------------------------------------
-        // Add ALL images using the same field name
-        //
-        // FastAPI:
-        // files: list[UploadFile]
-        // ----------------------------------------------------
-
-        for (const imagePath of imagePaths) {
-
-            const imageBuffer =
-                fs.readFileSync(imagePath);
-
-            const imageBlob =
-                new Blob([imageBuffer]);
+            const imageBlob = new Blob([imageBuffer]);
 
             formData.append(
                 "files",
@@ -87,77 +44,52 @@ const processPackageImages = async (imagePaths) => {
             );
         }
 
-
-        // ----------------------------------------------------
-        // Send to FastAPI
-        // ----------------------------------------------------
-
         const response = await fetch(
             AI_SERVICE_URL,
             {
                 method: "POST",
-
                 body: formData,
-
-                // OCR can take some time
-                signal: AbortSignal.timeout(
-                    600000
-                )
+                signal: AbortSignal.timeout(600000)
             }
         );
 
-
-        // ----------------------------------------------------
-        // Read response
-        // ----------------------------------------------------
-
         const responseText = await response.text();
 
-console.log("AI service HTTP status:", response.status);
-console.log("AI service raw response:", responseText);
+        console.log(
+            "AI service HTTP status:",
+            response.status
+        );
 
-let result;
+        console.log(
+            "AI service raw response:",
+            responseText
+        );
 
-try {
-    result = responseText
-        ? JSON.parse(responseText)
-        : {};
-} catch (parseError) {
-    throw new Error(
-        `AI service returned invalid JSON: ${responseText}`
-    );
-}
+        let result;
 
-
-        // ----------------------------------------------------
-        // Handle FastAPI error
-        // ----------------------------------------------------
-
-        if (!response.ok) {
-
+        try {
+            result = responseText
+                ? JSON.parse(responseText)
+                : {};
+        } catch {
             throw new Error(
-                result.detail ||
-                "AI service returned an error"
+                `AI service returned invalid JSON`
             );
         }
 
+        if (!response.ok) {
+            throw new Error(
+                result.detail ||
+                result.error ||
+                "AI service returned an error"
+            );
+        }
 
         console.log(
             "AI processing completed successfully."
         );
 
-
-        console.log(
-            `Processed ${imagePaths.length} image(s).`
-        );
-
-
-        // ----------------------------------------------------
-        // Return REAL AI result
-        // ----------------------------------------------------
-
         return result;
-
 
     } catch (error) {
 
@@ -166,43 +98,21 @@ try {
             error.message
         );
 
-
         return {
-
             success: false,
-
-            message:
-                "AI processing failed",
-
-            error:
-                error.message
+            message: "AI processing failed",
+            error: error.message
         };
     }
 };
 
 
-// ============================================================
-// BACKWARD COMPATIBILITY
-// Existing backend code may still call:
-// processPackageImage(imagePath)
-// ============================================================
-
 const processPackageImage = async (imagePath) => {
-
-    return processPackageImages([
-        imagePath
-    ]);
+    return processPackageImages([imagePath]);
 };
 
 
-// ============================================================
-// EXPORTS
-// ============================================================
-
 module.exports = {
-
     processPackageImage,
-
     processPackageImages
-
 };
