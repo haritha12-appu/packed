@@ -49,7 +49,7 @@ const processPackageImages = async (imagePaths) => {
             {
                 method: "POST",
                 body: formData,
-                signal: AbortSignal.timeout(600000)
+               signal: AbortSignal.timeout(120000)
             }
         );
 
