@@ -13,3 +13,4 @@ ai-service/uploads/
 *.backup2
 *.txt
 ai-service/pipeline_result.json
+ai-service/venv/
