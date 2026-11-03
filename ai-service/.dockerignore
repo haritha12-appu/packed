@@ -1,0 +1,15 @@
+venv/
+ai-env/
+__pycache__/
+*.pyc
+uploads/
+ocr_backups/
+*_backup.py
+*.backup
+*.backup2
+test_*.py
+test_pipeline.py
+*.txt
+*.json
+.git/
+!requirements.txt

@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile, HTTPException
 
 from preprocessing import preprocess_image
-from ocr import get_ocr_result_from_images
+from ocr_tesseract import get_ocr_result_from_images
 from nlp import process_ocr_text
 from compliance import LegalMetrologyRuleEngine
 
