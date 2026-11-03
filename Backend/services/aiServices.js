@@ -65,23 +65,40 @@ const processPackageImages = async (imagePaths) => {
             responseText
         );
 
-        let result;
+        let result = {};
 
         try {
             result = responseText
                 ? JSON.parse(responseText)
                 : {};
         } catch {
-            throw new Error(
-                `AI service returned invalid JSON`
-            );
+            result = null;
         }
 
         if (!response.ok) {
+            const unavailable = [429, 502, 503, 504];
+
+            if (unavailable.includes(response.status)) {
+                throw new Error(
+                    `AI service is unavailable or restarting ` +
+                    `(HTTP ${response.status}). ` +
+                    `Please try again in a minute.`
+                );
+            }
+
+            const detail =
+                result && (result.detail || result.error);
+
             throw new Error(
-                result.detail ||
-                result.error ||
-                "AI service returned an error"
+                typeof detail === "string"
+                    ? detail
+                    : `AI service returned HTTP ${response.status}`
+            );
+        }
+
+        if (result === null) {
+            throw new Error(
+                "AI service returned invalid JSON"
             );
         }
 
